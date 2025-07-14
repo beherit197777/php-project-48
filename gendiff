@@ -4,6 +4,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 use Docopt\Handler as Docopt;
+use function Gendiff\parseFile;
 
 $doc = <<<DOC
 Generate diff
@@ -11,12 +12,41 @@ Generate diff
 Usage:
   gendiff (-h|--help)
   gendiff (-v|--version)
+  gendiff [--format <fmt>] <firstFile> <secondFile>
 
 Options:
-  -h --help     Show this screen
-  -v --version  Show version
+  -h --help                     Show this screen
+  -v --version                  Show version
+  --format <fmt>                Report format [default: stylish]
 DOC;
 
-$args = (new Docopt())->handle($doc, ['version' => '1.0.0']);
+$args = (new Docopt())->handle($doc, [
+    'version' => '1.0.0',
+]);
 
-print_r($args);
+$firstPath = $args['<firstFile>'];
+$secondPath = $args['<secondFile>'];
+
+$data1 = parseFile($firstPath);
+$data2 = parseFile($secondPath);
+if (!empty($args['<firstFile>']) && !empty($args['<secondFile>'])) {
+    $firstPath = $args['<firstFile>'];
+    $secondPath = $args['<secondFile>'];
+
+    $data1 = parseFile($firstPath);
+    $data2 = parseFile($secondPath);
+
+    echo "First file parsed:\n";
+    print_r($data1);
+
+    echo "\nSecond file parsed:\n";
+    print_r($data2);
+} else {
+    echo $doc;
+}
+
+echo "First file parsed:\n";
+print_r($data1);
+
+echo "\nSecond file parsed:\n";
+print_r($data2);
